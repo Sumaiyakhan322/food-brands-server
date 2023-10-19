@@ -79,6 +79,13 @@ async function run() {
   const result=await productCollection.updateOne(filter,product,options)
   res.send(result);
  })
+ //delete a product
+ app.delete('/products/:id',async(req,res)=>{
+  const id=req.params.id;
+  const query={_id:new ObjectId(id)}
+  const result=await productCollection.deleteMany(query)
+  res.send(result)
+ })
 //add cart products
  app.post('/usersProducts',async(req,res)=>{
   const newProduct=req.body;
