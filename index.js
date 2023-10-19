@@ -11,7 +11,7 @@ app.use(express.json())
 
 
 app.get('/',(req,res)=>{
-    res.send('serbe is rummig')
+    res.send('brand server is running')
 })
 app.listen(port,()=>{
     console.log(`${port}`);
@@ -31,8 +31,9 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const productCollection = client.db("ProductDB").collection("Product");
+    const UserAddProductCollection = client.db("UserDB").collection("UserADDProduct");
     ;
 
     //add a product
@@ -49,6 +50,20 @@ async function run() {
       const result=await cursor.toArray();
       res.send(result);
  })
+//add cart products
+ app.post('/usersProducts',async(req,res)=>{
+  const newProduct=req.body;
+  console.log(newProduct);
+  const result=await UserAddProductCollection.insertOne(newProduct);
+  res.send(result);
+})
+app.get('/usersProducts',async(req,res)=>{
+  const cursor=UserAddProductCollection.find();
+  const result=await cursor.toArray();
+  res.send(result);
+
+}
+)
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
