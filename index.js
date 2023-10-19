@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port=process.env.PORT || 5000
 //middlewares
@@ -50,10 +50,39 @@ async function run() {
       const result=await cursor.toArray();
       res.send(result);
  })
+
+ //update a product
+ app.get('/products/:id',async(req,res)=>{
+  const id=req.params.id;
+  const query={_id :new ObjectId(id)}
+  const result =await productCollection.findOne(query);
+  res.send(result)
+
+ })
+ //put update the product
+ app.put('/products/:id',async(req,res)=>{
+  const id=req.params.id;
+  const filter={_id:new ObjectId(id)}
+  const options={upset:true}
+  const updateProduct=req.body;
+  const product={
+    $set:{
+      name:updateProduct.name,
+       brandName:updateProduct.brandName,
+       img:updateProduct.img,
+       type:updateProduct.type,
+       price:updateProduct.price,
+       rating:updateProduct.rating,
+       des:updateProduct.des,
+    }
+  }
+  const result=await productCollection.updateOne(filter,product,options)
+  res.send(result);
+ })
 //add cart products
  app.post('/usersProducts',async(req,res)=>{
   const newProduct=req.body;
-  console.log(newProduct);
+  
   const result=await UserAddProductCollection.insertOne(newProduct);
   res.send(result);
 })
@@ -64,8 +93,10 @@ app.get('/usersProducts',async(req,res)=>{
 
 }
 )
+
+
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
